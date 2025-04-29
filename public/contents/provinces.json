@@ -1,0 +1,20 @@
+[
+  {
+    "id": "chiangmai",
+    "name": "Chiang Mai",
+    "description": "Discover the cultural heart of Thailand with ancient temples, lush mountains, and vibrant night markets.",
+    "image": "https://i0.wp.com/www.iurban.in.th/wp-content/uploads/2017/09/icover2017-romantic-cm5-1.jpg"
+  },
+  {
+    "id": "phuket",
+    "name": "Phuket",
+    "description": "Relax on stunning beaches, dive into crystal-clear waters, and enjoy a lively nightlife.",
+    "image": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/4b/5d/c8/caption.jpg?w=1200&h=-1&s=1&cx=2606&cy=1838&chk=v1_a61182fd4040ed4ecc4e"
+  },
+  {
+    "id": "krabi",
+    "name": "Krabi",
+    "description": "Explore dramatic limestone cliffs, hidden lagoons, and some of the best beaches in Thailand.",
+    "image": "https://www.eatchillwander.com/wp-content/uploads/2020/10/krabi-complete-travel-guide.jpg"
+  }
+]
