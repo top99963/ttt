@@ -21,7 +21,7 @@ export default function RootLayout({
         <>
           <nav className="fixed top-[8px] left-[8px]">
             <Link className="p-2 text-xs rounded-2xl bg-emerald-800" href={"/"}>
-              HomeJa
+              Home
             </Link>
           </nav>
           {children}

@@ -1,5 +1,9 @@
 function Map() {
-  return <div>Young mai dai tum</div>;
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      Young mai dai tum
+    </div>
+  );
 }
 
 export default Map;
