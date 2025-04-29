@@ -8,7 +8,6 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({
   title,
   description,
-  image,
   category,
 }) => {
   return (
