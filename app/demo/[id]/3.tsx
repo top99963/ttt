@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const timeGap = 0.1;
 const totalItems = 10;
-const snapItem = gsap.utils.snap(timeGap);
+// const snapItem = gsap.utils.snap(timeGap);
 
 function Three() {
   const container = useRef(null);
@@ -86,9 +86,9 @@ function Three() {
         scrollTrigger: {},
       });
 
-      // const snap = items.map(
-      //   (item, index) => index / items.length + index * 0.011
-      // );
+      const snap = items.map(
+        (item, index) => index / items.length + index * 0.011
+      );
 
       ScrollTrigger.create({
         start: 0,
@@ -96,20 +96,20 @@ function Three() {
         pin: ".gallery",
         onUpdate: (self) => {
           console.log(self);
-          SCRUB.vars.totalTime = snapItem(self.progress * LOOP.duration());
-          // SCRUB.vars.totalTime = self.progress * LOOP.duration();
+          // SCRUB.vars.totalTime = snapItem(self.progress * LOOP.duration());
+          SCRUB.vars.totalTime = self.progress * LOOP.duration();
           SCRUB.invalidate().restart();
         },
-        // snap: {
-        //   snapTo: snap,
-        //   duration: {
-        //     max: 0.3,
-        //     min: 0.02,
-        //   },
-        //   delay: 0.0,
-        //   ease: "none",
-        //   directional: false,
-        // },
+        snap: {
+          snapTo: snap,
+          duration: {
+            max: 0.3,
+            min: 0.02,
+          },
+          delay: 0.0,
+          ease: "none",
+          directional: false,
+        },
       });
 
       // ScrollSmoother.create({
