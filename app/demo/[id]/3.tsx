@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 gsap.registerPlugin(useGSAP);
 gsap.registerPlugin(ScrollTrigger);
@@ -14,19 +14,9 @@ const snapItem = gsap.utils.snap(timeGap);
 
 function Three() {
   const container = useRef(null);
-  const [currentIndex] = useState<number>(0);
-
-  useEffect(() => {
-    console.log(currentIndex);
-  }, [currentIndex]);
-
   useGSAP(
     () => {
       const items = gsap.utils.toArray<HTMLLIElement>(".items .item");
-
-      const OVERLAP = Math.ceil(1 / timeGap);
-      const START = items.length * timeGap;
-      const LOOP_TIME = (items.length + OVERLAP) * timeGap + 1;
       const LOOP = gsap.timeline({
         paused: true,
         repeat: -1,
@@ -56,8 +46,6 @@ function Three() {
           time
         ).fromTo(
           item,
-          //   { xPercent: 250 },
-          //   { xPercent: -250, duration: 1, ease: "none", immediateRender: false },
           { xPercent: -50 },
           {
             keyframes: {
@@ -78,62 +66,56 @@ function Three() {
         );
       }
 
-      // here's where we set up the scrubbing of the playhead to make it appear seamless.
+      const SPACING = 0.1;
+      const OVERLAP = 0;
+      const START = 0.5;
+      const LOOP_TIME = (items.length - 1 + OVERLAP) * SPACING + 1 - 0.5;
+
       RAW.time(START);
       LOOP.to(RAW, {
         time: LOOP_TIME,
         duration: LOOP_TIME - START,
         ease: "none",
-      }).fromTo(
-        RAW,
-        { time: OVERLAP * timeGap + 1 },
-        {
-          time: START,
-          duration: START - (OVERLAP * timeGap + 1),
-          immediateRender: false,
-          ease: "none",
-        }
-      );
+      });
 
-      const SCRUB = gsap.to(RAW, {
+      const SCRUB = gsap.to(LOOP, {
         totalTime: 0,
         duration: 0.5,
         ease: "power3",
         paused: true,
+        scrollTrigger: {},
       });
 
-      // let iteration = 0;
-      // let isWrapping = false;
+      // const snap = items.map(
+      //   (item, index) => index / items.length + index * 0.011
+      // );
 
-      // const wrapForward = (trigger: ScrollTrigger) => {
-      //   console.log("iteration ", iteration);
-      //   iteration++;
-      //   isWrapping = true;
-      //   trigger.scroll(trigger.start + 1);
-      // };
-
-      // const wrapBackward = (trigger: ScrollTrigger) => {
-      //   iteration--;
-      //   if (iteration < 0) {
-      //     iteration = 9;
-      //     LOOP.totalTime(LOOP.totalTime() + LOOP.duration() * 10);
-      //   }
-
-      //   trigger.scroll(trigger.end - 1);
-      // };
-
-      gsap.timeline({
-        scrollTrigger: {
-          start: 0,
-          end: "+=6000",
-          pin: ".gallery",
-          onUpdate: (self) => {
-            SCRUB.vars.totalTime = snapItem(self.progress * LOOP.duration());
-            SCRUB.invalidate().restart();
-            // isWrapping = false;
-          },
+      ScrollTrigger.create({
+        start: 0,
+        end: "+=2000",
+        pin: ".gallery",
+        onUpdate: (self) => {
+          console.log(self);
+          SCRUB.vars.totalTime = snapItem(self.progress * LOOP.duration());
+          // SCRUB.vars.totalTime = self.progress * LOOP.duration();
+          SCRUB.invalidate().restart();
         },
+        // snap: {
+        //   snapTo: snap,
+        //   duration: {
+        //     max: 0.3,
+        //     min: 0.02,
+        //   },
+        //   delay: 0.0,
+        //   ease: "none",
+        //   directional: false,
+        // },
       });
+
+      // ScrollSmoother.create({
+      //   // wrapper: container,
+      //   // content: ".gallery",
+      // });
     },
     { scope: container }
   );
@@ -143,7 +125,8 @@ function Three() {
   return (
     <div ref={container} className="">
       <div className="gallery">
-        <div className="items flex items-center justify-center relative w-screen h-screen overflow-y-hidden">
+        <div className="items flex flex-col items-center justify-center relative w-screen h-screen overflow-x-hidden">
+          <div className="absolute w-1 h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white"></div>
           {Array.from({ length: totalItems }).map((_, i) => (
             <div key={i} className={cardStyle}>
               {i}
