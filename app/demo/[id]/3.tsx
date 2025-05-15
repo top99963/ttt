@@ -3,17 +3,24 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import TiltCard from "./2";
 
 gsap.registerPlugin(useGSAP);
 gsap.registerPlugin(ScrollTrigger);
 
-const timeGap = 0.1;
-const totalItems = 10;
-// const snapItem = gsap.utils.snap(timeGap);
+const amount = 10;
+const spacing = 0.1;
+const start = 0.5;
+const loopTime = (amount - 1) * spacing + 1 - 0.5;
 
 function Three() {
   const container = useRef(null);
+  const trigger = useRef<ScrollTrigger>(null);
+  const scrub = useRef<gsap.core.Tween>(null);
+  const loop = useRef<gsap.core.Timeline>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   useGSAP(
     () => {
       const items = gsap.utils.toArray<HTMLLIElement>(".items .item");
@@ -30,7 +37,7 @@ function Three() {
 
       for (i = 0; i < items.length; i++) {
         item = items[i];
-        time = i * timeGap;
+        time = i * spacing;
         RAW.fromTo(
           item,
           { scale: 0.3 },
@@ -66,15 +73,10 @@ function Three() {
         );
       }
 
-      const SPACING = 0.1;
-      const OVERLAP = 0;
-      const START = 0.5;
-      const LOOP_TIME = (items.length - 1 + OVERLAP) * SPACING + 1 - 0.5;
-
-      RAW.time(START);
+      RAW.time(start);
       LOOP.to(RAW, {
-        time: LOOP_TIME,
-        duration: LOOP_TIME - START,
+        time: loopTime,
+        duration: (loopTime - start).toPrecision(1),
         ease: "none",
       });
 
@@ -83,25 +85,24 @@ function Three() {
         duration: 0.5,
         ease: "power3",
         paused: true,
-        scrollTrigger: {},
       });
 
-      const snap = items.map(
-        (item, index) => index / items.length + index * 0.011
-      );
+      scrub.current = SCRUB;
+      loop.current = LOOP;
 
-      ScrollTrigger.create({
+      trigger.current = ScrollTrigger.create({
+        scroller: container.current,
         start: 0,
-        end: "+=2000",
-        pin: ".gallery",
+        end: `+=` + amount * 150,
+        pin: ".items",
         onUpdate: (self) => {
-          console.log(self);
-          // SCRUB.vars.totalTime = snapItem(self.progress * LOOP.duration());
           SCRUB.vars.totalTime = self.progress * LOOP.duration();
           SCRUB.invalidate().restart();
+          const index = Math.round(self.progress * (items.length - 1));
+          setCurrentIndex(index);
         },
         snap: {
-          snapTo: snap,
+          snapTo: items.map((_, index) => index / (items.length - 1)),
           duration: {
             max: 0.3,
             min: 0.02,
@@ -111,28 +112,58 @@ function Three() {
           directional: false,
         },
       });
-
-      // ScrollSmoother.create({
-      //   // wrapper: container,
-      //   // content: ".gallery",
-      // });
     },
     { scope: container }
   );
 
-  const cardStyle = `w-[450px] h-[600px] bg-gray-500 rounded-3xl flex items-center justify-center item absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-2`;
+  const cardStyle = `item absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`;
+
+  const handleNext = () => {
+    const totalTime = scrub.current?.vars.totalTime + spacing;
+    const progress = totalTime / loop.current!.duration();
+    trigger.current?.scroll(
+      trigger.current.start +
+        progress * (trigger.current.end - trigger.current.start)
+    );
+  };
+  const handlePrev = () => {
+    const totalTime = scrub.current?.vars.totalTime - spacing;
+    const progress = totalTime / loop.current!.duration();
+    trigger.current?.scroll(
+      trigger.current.start +
+        progress * (trigger.current.end - trigger.current.start)
+    );
+  };
 
   return (
-    <div ref={container} className="">
-      <div className="gallery">
-        <div className="items flex flex-col items-center justify-center relative w-screen h-screen overflow-x-hidden">
-          <div className="absolute w-1 h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white"></div>
-          {Array.from({ length: totalItems }).map((_, i) => (
+    <div className="relative">
+      <div
+        ref={container}
+        className="max-h-[650px] overflow-y-scroll overflow-x-hidden"
+      >
+        <div className="items flex flex-col items-center justify-center relative h-[650px] w-[1300px]">
+          {Array.from({ length: amount }).map((_, i) => (
             <div key={i} className={cardStyle}>
-              {i}
+              <TiltCard key={i}>
+                <img
+                  className="w-full h-full object-cover"
+                  src={
+                    "https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=0.752xw:1.00xh;0.175xw,0&resize=1200:*"
+                  }
+                ></img>
+              </TiltCard>
             </div>
           ))}
         </div>
+      </div>
+      <div className="flex gap-2 items-center">
+        <button className="btn" onClick={handleNext}>
+          Next
+        </button>
+        {currentIndex}
+        <button className="btn" onClick={handlePrev}>
+          Prev
+        </button>
       </div>
     </div>
   );

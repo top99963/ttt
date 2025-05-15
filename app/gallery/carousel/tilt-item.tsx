@@ -2,7 +2,15 @@
 
 import React, { ReactNode, useRef } from "react";
 
-export const TiltCard = ({ children }: { children?: ReactNode }) => {
+export const TiltItem = ({
+  className,
+  children,
+  onClick,
+}: {
+  className?: string;
+  children?: ReactNode;
+  onClick?: () => void;
+}) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -34,19 +42,25 @@ export const TiltCard = ({ children }: { children?: ReactNode }) => {
 
   return (
     <div
-      className={`w-[450px] h-[600px] bg-gray-500 rounded-3xl overflow-hidden`}
-      style={{
-        transition: "transform 0.2s ease",
-        transformStyle: "preserve-3d",
-        willChange: "transform",
-      }}
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      className="item absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+      onClick={onClick}
     >
-      {children}
+      <div
+        className={`w-[450px] h-[600px] bg-gray-500 rounded-3xl overflow-hidden ${className}`}
+        style={{
+          transition: "transform 0.2s ease",
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+          boxShadow: "0px 40px 80px 0px #0000004D, 0px 7px 10px 0px #00000017",
+        }}
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </div>
     </div>
   );
 };
 
-export default TiltCard;
+export default TiltItem;
